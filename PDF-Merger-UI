@@ -1,0 +1,54 @@
+import os
+import tkinter as tk
+from tkinter import filedialog, messagebox
+from PyPDF2 import PdfMerger
+
+def select_files():
+    files = filedialog.askopenfilenames(filetypes=[("PDF files", "*.pdf")])
+    listbox.delete(0, tk.END)  # Clear existing entries in the listbox
+    for file in files:
+        listbox.insert(tk.END, file)
+    return files
+
+def merge_pdfs(files):
+    if not files:
+        messagebox.showwarning("Error", "No PDF files selected for merging.")
+        return
+
+    merger = PdfMerger()
+    sorted_files = sorted(files, key=lambda x: os.path.basename(x).lower())
+    
+    for file in sorted_files:
+        merger.append(file)
+    
+    if sorted_files:
+        first_file_path = os.path.dirname(sorted_files[0])
+        output_path = os.path.join(first_file_path, "merged_output.pdf")
+        merger.write(output_path)
+        merger.close()
+        messagebox.showinfo("Success", f"PDFs merged successfully! Saved as {output_path}")
+    else:
+        messagebox.showwarning("Error", "Please select PDF files to merge.")
+
+# Create main window
+root = tk.Tk()
+root.title("PDF Merger")
+
+# Label for PDF Files
+label = tk.Label(root, text="PDF Files")
+label.pack(pady=10)
+
+# Listbox to display selected PDF files
+listbox = tk.Listbox(root, width=50, height=10)
+listbox.pack(pady=10)
+
+# Button to browse and select PDF files
+browse_button = tk.Button(root, text="Browse", command=lambda: select_files())
+browse_button.pack(pady=10)
+
+# Button to merge selected PDF files
+merge_button = tk.Button(root, text="Merge PDF", command=lambda: merge_pdfs(listbox.get(0, tk.END)))
+merge_button.pack(pady=10)
+
+# Run the main event loop
+root.mainloop()
