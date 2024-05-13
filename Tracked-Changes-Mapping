@@ -1,24 +1,5 @@
 Public Sub ExtractTrackedChangesToNewDoc()
 
-    '=========================
-    'Macro created 2007 by Lene Fredborg, DocTools - www.thedoctools.com
-    'THIS MACRO IS COPYRIGHT. YOU ARE WELCOME TO USE THE MACRO BUT YOU MUST KEEP THE LINE ABOVE.
-    'YOU ARE NOT ALLOWED TO PUBLISH THE MACRO AS YOUR OWN, IN WHOLE OR IN PART.    
-    '=========================
-    'The macro creates a new document
-    'and extracts insertions and deletions
-    'marked as tracked changes from the active document
-    'NOTE: Other types of changes are skipped
-    '(e.g. formatting changes or inserted/deleted footnotes and endnotes)
-    'Only insertions and deletions in the main body of the document will be extracted
-    'The document will also include metadata
-    'Inserted text will be applied black font color
-    'Deleted text will be applied red font color
-    
-    'Minor adjustments are made to the styles used
-    'You may need to change the style settings and table layout to fit your needs
-    '=========================
-
     Dim oDoc As Document
     Dim oNewDoc As Document
     Dim oTable As Table
