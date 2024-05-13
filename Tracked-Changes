@@ -1,0 +1,37 @@
+import os
+import tkinter as tk
+from tkinter import filedialog
+from PyPDF2 import PdfMerger
+
+def select_files():
+    files = filedialog.askopenfilenames(filetypes=[("PDF files", "*.pdf")])
+    if files:
+        merge_pdfs(files)
+
+
+def merge_pdfs(files):
+    merger = PdfMerger()
+    sorted_files = sorted(files, key=lambda x: os.path.basename(x).lower())
+    
+    for file in sorted_files:
+        merger.append(file)
+    
+    output_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF files", "*.pdf")])
+    if output_path:
+        merger.write(output_path)
+        merger.close()
+        tk.messagebox.showinfo("Success", "PDFs merged successfully!")
+    else:
+        tk.messagebox.showwarning("Error", "Please specify the output file path.")
+
+# Create main window
+root = tk.Tk()
+root.title("PDF Merger")
+
+# Button to select PDF files
+select_button = tk.Button(root, text="Select PDF Files", command=select_files)
+select_button.pack(pady=20)
+
+# Run the main event loop
+root.mainloop()
+
