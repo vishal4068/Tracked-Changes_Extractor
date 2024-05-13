@@ -1,0 +1,43 @@
+Sub ExtractTrackedChangesToPDF()
+    Dim oDoc As Document
+    Dim oRevision As Revision
+    Dim pageNum As Long
+    Dim tempDoc As Document
+    Dim saveFolder As String
+    Dim lastPageNum As Long
+
+    Set oDoc = ActiveDocument
+    saveFolder = Left(oDoc.FullName, InStrRev(oDoc.FullName, "\"))
+
+    ' Determine the last page number of the document
+    lastPageNum = oDoc.ComputeStatistics(wdStatisticPages)
+
+    For Each oRevision In oDoc.Revisions
+        If oRevision.Type = wdRevisionInsert Or oRevision.Type = wdRevisionDelete Then
+            pageNum = oRevision.Range.Information(wdActiveEndPageNumber)
+
+            ' Copy content of the page with tracked change to a new document
+            Set tempDoc = Documents.Add
+
+            If pageNum = lastPageNum Then
+                ' If the revision is on the last page, adjust the range to copy until the end of the document
+                oDoc.Range(Start:=oDoc.Range.GoTo(What:=wdGoToPage, Which:=wdGoToAbsolute, Count:=pageNum).Start, _
+                           End:=oDoc.Content.End).Copy
+            Else
+                ' Normal behavior for non-last pages
+                oDoc.Range(Start:=oDoc.Range.GoTo(What:=wdGoToPage, Which:=wdGoToAbsolute, Count:=pageNum).Start, _
+                           End:=oDoc.Range.GoTo(What:=wdGoToPage, Which:=wdGoToAbsolute, Count:=pageNum + 1).Start).Copy
+            End If
+
+            tempDoc.Range.Paste
+
+            ' Save the new document as a PDF file with a meaningful name in the same folder
+            tempDoc.ExportAsFixedFormat OutputFileName:=saveFolder & "Page_" & pageNum & "_TrackedChanges.pdf", _
+                ExportFormat:=wdExportFormatPDF
+            tempDoc.Close SaveChanges:=wdDoNotSaveChanges
+        End If
+    Next oRevision
+
+    Set oDoc = Nothing
+    Set tempDoc = Nothing
+End Sub
